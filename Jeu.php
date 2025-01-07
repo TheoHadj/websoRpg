@@ -120,10 +120,11 @@ class Jeu implements MessageComponentInterface {
         echo "Connexion {$conn->resourceId} déconnectée\n";
         // this->playerTurnList
         
-        // $this->playerTurnList = array_filter(
-          
-        // );
+        $index = array_search($$conn, $this->playerTurnList, true);
 
+        if ($index !== false) {
+            unset($this->playerTurnList[$index]);
+        }
     }
 
 
