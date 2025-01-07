@@ -10,6 +10,8 @@
         <div id="chat-messages"></div>
             <button id="attaque">Attaquer</button>
             <button id="SuperAttaque">Super Attaque</button>
+            <button id="Taunt">Provoquer</button>
+            <button id="Heal">Se soigner</button>
 
     </div>
     <script src="./script.js"></script>

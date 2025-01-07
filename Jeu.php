@@ -23,7 +23,7 @@ class Jeu implements MessageComponentInterface {
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
         echo "Nouvelle connexion! ({$conn->resourceId})\n";
-        $j = new Joueur( $conn->resourceId,100,10,0);
+        $j = new Joueur( $conn->resourceId,100,10,0,1);
         $this->partie->ajouterJoueur($j);
         echo "HP du monstre : {$this->partie->getMonstre()->getHp()}";
         var_dump($this->partie);
@@ -31,6 +31,8 @@ class Jeu implements MessageComponentInterface {
             // $this->playerTurn = $this->partie->playerTurn();
             $this->playerTurn = $conn;
             $conn->send('your turn');
+            $this->partie->getMonstre()->setFocus($j);
+
         }
         // elseif($this->playerTurnList==[]){
         //     $this->playerTurnList = $this->clients;
@@ -51,7 +53,7 @@ class Jeu implements MessageComponentInterface {
     
         
 
-        $j = $this->partie->getOneJoueurById($from->resourceId);    
+        $j = $this->partie->getOneJoueurById($from->resourceId);
         $action= json_decode($msg, true)['action'];
     
 
@@ -66,6 +68,18 @@ class Jeu implements MessageComponentInterface {
         else if ($action == "SuperAttaque"){
             echo("SUUUUUUUUUUUUUUUUUUUUUUUUUUPER ACTION");
             $this->partie->getMonstre()->setHp($this->partie->getMonstre()->getHp() - 100000);
+            echo "HP du monstre : {$this->partie->getMonstre()->getHp()}";
+        }
+
+        else if ($action == "Provoquer"){
+            echo("AAAAAAAAAAAAAAAAAAAA ATTAQUE MOI");
+            $this->partie->getMonstre()->setFocus($j);
+            echo "HP du monstre : {$this->partie->getMonstre()->getHp()}";
+        }
+
+        else if ($action == "Heal"){
+            echo("A LAIDE JE ME SOIGNE");
+            $j->setHp($j->getHp() + $j->getAtt());
             echo "HP du monstre : {$this->partie->getMonstre()->getHp()}";
         }
         
@@ -83,11 +97,10 @@ class Jeu implements MessageComponentInterface {
                 
 
                 $msg = sprintf('Monstre tué !! Niveau : %d !! Un nouveau Monstre apparaît : Hp du monstre : %d',  $this->partie->getNiveau(), $this->partie->getMonstre()->getHp());
-    
-                if($from !== $client) {
-                    $client->send($msg);
-                    $strClient .= var_dump($client->resourceId);
-                }
+                $this->partie->getMonstre()->setFocus($j);
+                $client->send($msg);
+                $strClient .= var_dump($client->resourceId);
+        
             }
 
         }
@@ -95,7 +108,7 @@ class Jeu implements MessageComponentInterface {
     
             foreach ($this->clients as $client) {
                 
-                $msg = sprintf('{"action":"attaque", "from": %d, "att" : %s, Hp du monstre : %d}', $j->getId(), $j->getAtt(), $this->partie->getMonstre()->getHp() );
+                $msg = sprintf('{"action": %s, "from": %d, "att" : %s, Hp du monstre : %d, hp du joueur : %d}',$action, $j->getId(), $j->getAtt(), $this->partie->getMonstre()->getHp(), $j->getHp());
                 
                 // if ($from !== $client) {  //On peut rajouter un vous avez attaqué voir écrire directement sans passer par la webso
                     $client->send($msg);
@@ -106,7 +119,15 @@ class Jeu implements MessageComponentInterface {
         echo sprintf("%s", $strClient);
 
         if($this->playerTurnList==[]){
-            foreach ($this->clients as $client) {$this->playerTurnList[] = $client;}
+            $this->partie->getMonstre()->attaque();
+            foreach ($this->clients as $client) {
+                $this->playerTurnList[] = $client;
+                $client->send("Le monstre attaque");
+            }
+
+
+
+
         };
         echo(count($this->playerTurnList));
         $this->playerTurn = array_pop($this->playerTurnList);
@@ -118,9 +139,18 @@ class Jeu implements MessageComponentInterface {
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
         echo "Connexion {$conn->resourceId} déconnectée\n";
-        // this->playerTurnList
+        if($this->playerTurn==$conn){
+            if($this->playerTurnList==[]){
+                $this->partie->getMonstre()->attaque();
+                foreach ($this->clients as $client) {
+                    $this->playerTurnList[] = $client;
+                    $client->send("Le monstre attaque");
+                }
+
+            }
+        }
         
-        $index = array_search($$conn, $this->playerTurnList, true);
+        $index = array_search($conn, $this->playerTurnList, true);
 
         if ($index !== false) {
             unset($this->playerTurnList[$index]);

@@ -6,15 +6,19 @@ const messageInput = document.getElementById('message-input');
 
 const buttonAttaque = document.getElementById('attaque');
 const buttonSuperAttaque = document.getElementById('SuperAttaque');
+const buttonProvoke = document.getElementById('Taunt');
+const buttonHeal = document.getElementById('Heal');
 let msg;
 
 buttonAttaque.addEventListener("click", function() {
     msg = '{"action" : "attaque"}';
-    console.log("a");
     conn.send(msg);
     
     buttonAttaque.disabled=true;
     buttonSuperAttaque.disabled=true;
+    buttonProvoke.disabled=true;
+    buttonHeal.disabled=true;
+
   
 
 })
@@ -22,16 +26,49 @@ buttonAttaque.addEventListener("click", function() {
 
 buttonSuperAttaque.addEventListener("click", function() {
     msg = '{"action" : "SuperAttaque"}';
-    console.log("b");    
     conn.send(msg);
 
     buttonAttaque.disabled=true;
     buttonSuperAttaque.disabled=true;
+    buttonProvoke.disabled=true;
+    buttonHeal.disabled=true;
+
+
   
   })
 
-  buttonAttaque.disabled=true;
-  buttonSuperAttaque.disabled=true;
+buttonProvoke.addEventListener("click", function() {
+    msg = '{"action" : "Provoquer"}';
+    conn.send(msg);
+
+    buttonAttaque.disabled=true;
+    buttonSuperAttaque.disabled=true;
+    buttonProvoke.disabled=true;
+    buttonHeal.disabled=true;
+
+
+
+})
+
+buttonHeal.addEventListener("click", function() {
+    msg = '{"action" : "Heal"}';
+    conn.send(msg);
+
+    buttonAttaque.disabled=true;
+    buttonSuperAttaque.disabled=true;
+    buttonProvoke.disabled=true;
+    buttonHeal.disabled=true;
+
+
+
+})
+
+buttonAttaque.disabled=true;
+buttonSuperAttaque.disabled=true;
+buttonProvoke.disabled=true;
+buttonHeal.disabled=true;
+
+
 
 
 // Actions à effectuer lorsque la connexion est établie
@@ -44,6 +81,8 @@ conn.onmessage = function(e) {
     if(e.data == "your turn"){
         buttonAttaque.disabled=false;
         buttonSuperAttaque.disabled=false;
+        buttonProvoke.disabled=false;
+        buttonHeal.disabled=false;
         console.log(e.data);
       
     }

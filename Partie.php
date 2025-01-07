@@ -66,7 +66,7 @@ class Partie{
     }
 
     public function setMonstre(): void {
-        $this->monstre = new Monstre("1", "5000","10","0");
+        $this->monstre = new Monstre($this->niveau);
     }
 
     public function GameOver(bool $active): void {
