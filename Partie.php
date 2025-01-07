@@ -10,6 +10,7 @@ use Ratchet\ConnectionInterface;
 
 class Partie{
     private array $listJoueur = [];
+    private array $listJoueurOrdre = [];
     private int $niveau = 1;
     private int $nombreJoueur = 0;
     private bool $active = true;
@@ -24,6 +25,10 @@ class Partie{
     
     public function getListJoueur(): array {
         return $this->listJoueur;
+    }
+
+    public function getListJoueurOrdre(): array {
+        return $this->listJoueurOrdre;
     }
 
     public function getNiveau(): int {
@@ -50,10 +55,14 @@ class Partie{
 
     public function setListJoueur(array $listJoueur): void {
         $this->listJoueur = $listJoueur;
+        $this->listJoueurOrdre = $listJoueur;
     }
 
     public function setNiveau(int $niveau): void {
         $this->niveau = $niveau;
+    }
+    public function nextNiveau(): void {
+        $this->niveau ++;
     }
 
     public function setMonstre(): void {
@@ -66,6 +75,7 @@ class Partie{
 
     public function ajouterJoueur(Joueur $joueur): void {
         $this->listJoueur[] = $joueur;
+        $this->listJoueurOrdre[] = $joueur;
         $this->nombreJoueur +=1;
     }
 
@@ -74,6 +84,11 @@ class Partie{
             $this->listJoueur,
             fn($j) => $j !== $joueur
         );
+    }
+
+    public function playerTurn(): Joueur {
+        $tmp = array_pop($this->listJoueurOrdre);
+        return $tmp;
     }
 }
     

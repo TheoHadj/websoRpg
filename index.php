@@ -8,9 +8,9 @@
 <body>
     <div id="chat-container">
         <div id="chat-messages"></div>
-        <form id="message-form">
-            <button type="submit">Attaquer</button>
-        </form>
+            <button id="attaque">Attaquer</button>
+            <button id="SuperAttaque">Super Attaque</button>
+
     </div>
     <script src="./script.js"></script>
 </body>
